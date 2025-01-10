@@ -2,13 +2,17 @@
     <v-container>
         <h1>SpaceX Launches</h1>
         <!-- Dropdown for filtering by year -->
-        <v-select v-model="selectedYear" :items="years" label="Filter by Year" dense class="mb-4"></v-select>
+        <v-select v-model="selectedYear" :items="years" label="Filter by Year" dense clearable class="mb-4"></v-select>
+        <!-- Toggle for sorting by date -->
+         <v-btn @click="toggleSortOrder" class="mb-4">
+            Sort by Date: {{ sortOrder }}
+         </v-btn>
         <!-- Loading and error states -->
         <div v-if="loading">Loading launches...</div>
         <div v-if="error">Error loading launches: {{ error.message }}</div>
-        <!-- Display filtered launches -->
-        <v-row v-if="filteredLaunches && filteredLaunches.length">
-            <v-col v-for="(launch, index) in filteredLaunches" :key="index" cols="12" md="6" lg="4">
+        <!-- Display filtered and/or sorted launches -->
+        <v-row v-if="displayedLaunches && displayedLaunches.length">
+            <v-col v-for="(launch, index) in displayedLaunches" :key="index" cols="12" md="6" lg="4">
                 <v-card>
                     <v-card-title>{{ launch.mission_name }}</v-card-title>
                     <v-card-text>
@@ -29,6 +33,7 @@
 import { ref, computed } from 'vue'
 import { useAsyncQuery, gql } from '#imports'
 import { useLaunchFilter } from '~/composables/useLaunchFilter'
+import useLaunchSort from '~/composables/useLaunchSort'
 
 type Launch = {
     mission_name: string
@@ -72,12 +77,42 @@ const launches = computed(() => result.value?.launches || [])
 // Use the filter composable
 const { selectedYear, filteredLaunches } = useLaunchFilter(launches.value)
 
+// Use the sort composable
+const { sortOrder, sortedLaunches } = useLaunchSort(launches.value)
+
+// Combine filter and sort logic for final display
+const displayedLaunches = computed(() => {
+    // No filter and no sort
+    if (!selectedYear.value && sortOrder.value === 'Ascending') {
+        return launches.value
+    }
+    // Filter only
+    if (selectedYear.value && sortOrder.value === 'Ascending') {
+        return filteredLaunches.value
+    }
+    // Sort only
+    if (!selectedYear.value) {
+        return sortedLaunches.value
+    }
+    // Filter and sort
+    return [...filteredLaunches.value].sort((a, b) => {
+        const dateA = new Date(a.launch_date_utc).getTime()
+        const dateB = new Date(b.launch_date_utc).getTime()
+        return sortOrder.value === 'Ascending' ? dateA - dateB : dateB - dateA
+    })
+})
+
 // Get unique launch years
 const years = computed(() =>
     Array.from(
         new Set(launches.value.map((launch) => new Date(launch.launch_date_utc).getFullYear().toString()))
     )
 )
+
+// Toggle the sorting ordr
+const toggleSortOrder = () => {
+    sortOrder.value = sortOrder.value === 'Ascending' ? 'Descending' : 'Ascending'
+}
 </script>
 
 <style scoped>
