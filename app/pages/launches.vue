@@ -14,13 +14,18 @@
         <v-row v-if="displayedLaunches && displayedLaunches.length">
             <v-col v-for="(launch, index) in displayedLaunches" :key="index" cols="12" md="6" lg="4">
                 <v-card>
-                    <v-card-title>{{ launch.mission_name }}</v-card-title>
+                    <v-card-title>
+                        {{ launch.mission_name }}
+                    </v-card-title>
                     <v-card-text>
                         <p><strong>Launch Date:</strong> {{ new Date(launch.launch_date_utc).toLocaleDateString() }}</p>
                         <p v-if="launch.launch_site"><strong>Launch Site:</strong> {{ launch.launch_site.site_name_long }}</p>
                         <p><strong>Rocket Name:</strong> {{ launch.rocket.rocket_name }}</p>
                         <p v-if="launch.details"><strong>Details:</strong> {{ launch.details }}</p>
                     </v-card-text>
+                    <v-card-actions>
+                        <v-btn :to="`/rockets/${launch.rocket.rocket.id}`" color="primary">View Rocket Details</v-btn>
+                    </v-card-actions>
                 </v-card>
             </v-col>
         </v-row>
@@ -30,7 +35,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useAsyncQuery, gql } from '#imports'
 import { useLaunchFilter } from '~/composables/useLaunchFilter'
 import useLaunchSort from '~/composables/useLaunchSort'
@@ -62,6 +67,9 @@ const GET_LAUNCHES = gql`
             }
             rocket {
                 rocket_name
+                rocket{
+                    id
+                }
             }
             details
         }
