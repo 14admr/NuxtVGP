@@ -6,20 +6,7 @@
         <div v-if="error">Error loading rocket details: {{ error.message }}</div>
         <!-- Display rocket details -->
         <div v-else-if="rocket">
-            <v-card>
-                <v-card-title>{{ rocket.name }}</v-card-title>
-                <v-card-text>
-                    <p><strong>Description:</strong> {{ rocket.description }}</p>
-                    <p><strong>First Flight:</strong> {{ new Date(rocket.first_flight).toLocaleDateString() }}</p>
-                    <p><strong>Height:</strong> {{ rocket.height.feet }} ft ({{ rocket.height.meters }} m)</p>
-                    <p><strong>Diameter:</strong> {{ rocket.diameter.feet }} ft ({{ rocket.diameter.meters }} m)</p>
-                    <p><strong>Mass:</strong> {{ rocket.mass.kg }} kg</p>
-                    <p><strong>Number of Stages:</strong> {{ rocket.stages }}</p>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn @click="goBack" color="primary" class="mt-4">Back</v-btn>
-                </v-card-actions>
-            </v-card>
+            <RocketCard :rocket="rocket" @backClicked="goBack" />
         </div>
     </v-container>
 </template>
@@ -28,6 +15,7 @@
 import { useRoute, useRouter } from 'vue-router'
 import { useAsyncQuery, gql } from '#imports'
 import { computed } from 'vue'
+import RocketCard from '~/components/RocketCard.vue'
 
 type Rocket = {
     name: string
