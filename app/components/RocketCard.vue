@@ -9,9 +9,6 @@
             <p><strong>Mass:</strong> {{ rocket.mass.kg }} kg</p>
             <p><strong>Number of Stages:</strong> {{ rocket.stages }}</p>
         </v-card-text>
-        <v-card-actions>
-            <v-btn @click="$emit('backClicked')" color="primary">Back</v-btn>
-        </v-card-actions>
     </v-card>
 </template>
 

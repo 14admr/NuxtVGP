@@ -53,13 +53,27 @@ const GET_LAUNCHES = gql`
             launch_site {
                 site_name_long
             }
+            details
             rocket {
                 rocket_name
                 rocket{
                     id
+                    description
+                    first_flight
+                    height {
+                        meters
+                        feet
+                    }
+                    diameter {
+                        meters
+                        feet
+                    }
+                    mass {
+                        kg
+                    }
+                    stages
                 }
             }
-            details
         }
     }
 `
